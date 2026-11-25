@@ -1,0 +1,12 @@
+{
+  // Used only to type-check source + tests together: npm run typecheck (it never writes any files)
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // Tests live outside src, so the root folder must be the package folder
+    "rootDir": ".",
+    // Check only; do not emit JavaScript
+    "noEmit": true
+  },
+  // Check both the application and the tests
+  "include": ["src", "tests", "vitest.config.ts"]
+}

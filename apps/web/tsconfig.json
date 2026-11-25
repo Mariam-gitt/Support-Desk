@@ -1,0 +1,25 @@
+{
+  // Type-checking rules for the web app (Vite compiles the code; TypeScript only checks it: "noEmit")
+  "compilerOptions": {
+    // Modern JavaScript output and browser APIs
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    // Let Vite (a "bundler") decide how imports are resolved
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    // Understand JSX (the HTML-like syntax in React files)
+    "jsx": "react-jsx",
+    // Strictest everyday settings: catch mistakes early
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
+    // Do not write any files; we only check
+    "noEmit": true,
+    // Types for Vite features and Node (used by vite.config.ts)
+    "types": ["vite/client", "node"]
+  },
+  // Check the app code and the Vite config
+  "include": ["src", "vite.config.ts"]
+}

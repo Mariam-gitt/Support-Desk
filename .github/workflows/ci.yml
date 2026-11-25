@@ -1,0 +1,76 @@
+# CI = Continuous Integration: GitHub runs these checks automatically on every push and pull request
+name: CI
+
+# When to run
+on:
+  # On every push to main
+  push:
+    branches: [main]
+  # On every pull request
+  pull_request:
+
+jobs:
+  # One job called "api"
+  api:
+    # A fresh Linux machine
+    runs-on: ubuntu-latest
+    # A real PostgreSQL database that exists only while this job runs
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: support_desk_test
+        ports:
+          - 5432:5432
+        # Wait until the database accepts connections before starting the steps
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    # Settings used by every step; the test database name contains "test", as the tests require
+    env:
+      TEST_DATABASE_URL: postgresql://postgres:postgres@localhost:5432/support_desk_test
+    # Run every command inside the API folder
+    defaults:
+      run:
+        working-directory: apps/api
+    steps:
+      # Download the code
+      - uses: actions/checkout@v4
+      # Install Node.js
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/api/package-lock.json
+      # Install the exact dependency versions from package-lock.json
+      - run: npm ci
+      # Type-check the application and the tests
+      - run: npm run typecheck
+      # Run all tests (this also applies the migrations to the test database)
+      - run: npm test
+      # Make sure the production build works
+      - run: npm run build
+
+  # A second job for the web app
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: apps/web/package-lock.json
+      # Install the exact dependency versions from package-lock.json
+      - run: npm ci
+      # Type-check, then run the tests
+      - run: npm run typecheck
+      - run: npm test
+      # Make sure the production build works
+      - run: npm run build

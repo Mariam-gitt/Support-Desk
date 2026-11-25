@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<!-- A tiny DEVELOPMENT-ONLY page to watch real-time events; open it in two tabs and act in one -->
+<html lang="en">
+<head>
+  <!-- Tell the browser the text encoding -->
+  <meta charset="utf-8" />
+  <!-- The tab title -->
+  <title>Support Desk - realtime test</title>
+</head>
+<body style="font-family: sans-serif; max-width: 640px; margin: 24px auto; padding: 0 12px;">
+  <!-- The page heading -->
+  <h3>Realtime test</h3>
+  <!-- STEP 1: log in (this calls the same REST login endpoint as any client) -->
+  <input id="email" placeholder="email" value="m@test.com" />
+  <!-- The password box (type=password hides the characters) -->
+  <input id="password" type="password" placeholder="password" value="password123" />
+  <!-- Clicking this logs in and fills the business dropdown -->
+  <button id="loginBtn">1. Log in</button>
+  <!-- STEP 2: choose which business to watch (filled after login) -->
+  <br /><br />
+  <select id="orgSelect"></select>
+  <!-- Clicking this opens the live connection and joins the business's room -->
+  <button id="connectBtn">2. Connect live</button>
+  <!-- STEP 3: create a ticket so you can see the event arrive in the OTHER tab -->
+  <button id="createBtn">3. Create demo ticket</button>
+  <!-- The live log: newest line first -->
+  <pre id="log" style="background: #f4f4f4; padding: 10px; min-height: 200px; white-space: pre-wrap;"></pre>
+
+  <!-- Socket.IO serves its own browser library at this address automatically -->
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    // Look up the page elements we need to read from or write to
+    const logEl = document.getElementById("log");
+    // The business dropdown
+    const orgSelect = document.getElementById("orgSelect");
+    // The token lives only in memory (it disappears when you close the tab, which is safer than storing it)
+    let token = null;
+    // The live connection (created when you click "Connect live")
+    let socket = null;
+
+    // Add a line at the TOP of the log, with the time
+    function log(message) {
+      // textContent (not innerHTML) prevents injected HTML from running in the page
+      logEl.textContent = new Date().toLocaleTimeString() + "  " + message + "\n" + logEl.textContent;
+    }
+
+    // STEP 1: log in over normal HTTP and fill the dropdown with the user's businesses
+    document.getElementById("loginBtn").onclick = async () => {
+      // Send email + password to the login endpoint
+      const res = await fetch("/api/auth/login", {
+        // POST = send data
+        method: "POST",
+        // Tell the server the body is JSON
+        headers: { "Content-Type": "application/json" },
+        // Turn the form values into a JSON string
+        body: JSON.stringify({ email: document.getElementById("email").value, password: document.getElementById("password").value }),
+      });
+      // Read the JSON answer
+      const body = await res.json();
+      // Stop if login failed
+      if (!res.ok) return log("Login failed: " + body.message);
+      // Keep the token for later requests
+      token = body.data.token;
+      // Empty the dropdown before filling it
+      orgSelect.innerHTML = "";
+      // Add one option per business the user belongs to
+      body.data.memberships.forEach((m) => {
+        // Create an <option> element
+        const option = document.createElement("option");
+        // Its value is the business id (sent to the server later)
+        option.value = m.organizationId;
+        // Its visible text shows the business name and the user's role
+        option.textContent = m.organizationName + " (" + m.role + ")";
+        // Put it in the dropdown
+        orgSelect.appendChild(option);
+      });
+      // Confirm in the log
+      log("Logged in. Pick a business, then connect.");
+    };
+
+    // STEP 2: open the live connection and join the business's room
+    document.getElementById("connectBtn").onclick = () => {
+      // Close an older connection first, if any
+      if (socket) socket.disconnect();
+      // Connect, sending the token in the handshake (the server checks it before allowing the connection)
+      socket = io({ auth: { token } });
+      // Runs when the connection is established
+      socket.on("connect", () => {
+        // Report success
+        log("Socket connected");
+        // Ask to join the business's room; the third argument is the server's reply (an "acknowledgement")
+        socket.emit("org:join", orgSelect.value, (reply) => log("Join result: " + JSON.stringify(reply)));
+      });
+      // Runs if the server refuses the connection (for example a bad token)
+      socket.on("connect_error", (error) => log("Connect error: " + error.message));
+      // Listen for each event the server may push
+      ["ticket.created", "ticket.updated", "message.created"].forEach((name) => {
+        // When the event arrives, show its name and the first part of its data
+        socket.on(name, (data) => log(name + "  " + JSON.stringify(data).slice(0, 180)));
+      });
+    };
+
+    // STEP 3: create a ticket over normal HTTP; the server then pushes "ticket.created" to everyone connected
+    document.getElementById("createBtn").onclick = async () => {
+      // Send a new ticket to the business chosen in the dropdown
+      const res = await fetch("/api/orgs/" + orgSelect.value + "/tickets", {
+        // POST = send data
+        method: "POST",
+        // JSON body plus the login token
+        headers: { "Content-Type": "application/json", Authorization: "Bearer " + token },
+        // A demo ticket with a random number so you can tell them apart
+        body: JSON.stringify({
+          customer: { name: "Demo Customer", email: "demo@example.com" },
+          subject: "Demo ticket #" + Math.floor(Math.random() * 1000),
+          description: "Created from the realtime test page",
+        }),
+      });
+      // Report the HTTP status of the request
+      log("Create request finished with status " + res.status);
+    };
+  </script>
+</body>
+</html>
