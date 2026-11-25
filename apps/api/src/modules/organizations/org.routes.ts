@@ -12,6 +12,7 @@ import ticketRoutes from "../tickets/ticket.routes.js";
 import customerRoutes from "../customers/customer.routes.js";
 // Import the controllers that handle the requests
 import { getOrganizationController, listMembersController } from "./org.controller.js";
+import { inviteMemberController, removeMemberController } from "./team.controller.js";
 
 // Create the organizations router
 const router = Router();
@@ -24,6 +25,8 @@ router.get("/:orgId", getOrganizationController);
 
 // Only OWNER and ADMIN may see the member list (AGENTs get 403)
 router.get("/:orgId/members", requireRole("OWNER", "ADMIN"), listMembersController);
+router.post("/:orgId/invitations", requireRole("OWNER", "ADMIN"), inviteMemberController);
+router.delete("/:orgId/members/:userId", requireRole("OWNER", "ADMIN"), removeMemberController);
 
 // Mount the ticket routes under a business; the guards above already ran for them
 router.use("/:orgId/tickets", ticketRoutes);

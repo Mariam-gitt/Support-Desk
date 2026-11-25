@@ -8,7 +8,7 @@ export async function getOrganization(orgId: string) {
     // Search condition: the business id
     where: { id: orgId },
     // "select" = pick only the columns we want to send back (a safe habit: never return more than needed)
-    select: { id: true, name: true, createdAt: true },
+    select: { id: true, name: true, slug: true, createdAt: true },
   });
 }
 

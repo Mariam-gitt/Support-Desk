@@ -20,6 +20,7 @@ let io: Server | null = null;
 
 // A "room" = a named group of connections; every business gets its own room, so events never cross businesses
 const roomName = (orgId: string) => `org:${orgId}`;
+const userRoomName = (userId: string) => `user:${userId}`;
 
 // Start real-time support on top of the HTTP server
 export function initRealtime(httpServer: HttpServer) {
@@ -47,6 +48,8 @@ export function initRealtime(httpServer: HttpServer) {
 
   // Runs every time a browser successfully connects
   io.on("connection", (socket) => {
+    void socket.join(userRoomName(socket.data.userId as string));
+
     // A small helper that answers the client's "acknowledgement" callback safely (the client may not have sent one)
     const reply = (ack: unknown, answer: JoinReply) => {
       // Only call it if it really is a function
@@ -89,4 +92,19 @@ export function initRealtime(httpServer: HttpServer) {
 export function emitToOrg(orgId: string, event: RealtimeEvent, payload: unknown) {
   // "io?." means: do nothing if real-time was never started; "to(room)" limits delivery to that business only
   io?.to(roomName(orgId)).emit(event, payload);
+}
+
+export async function disconnectUserFromOrg(userId: string, orgId: string) {
+  if (!io) return;
+  const sockets = await io.in(userRoomName(userId)).fetchSockets();
+  for (const socket of sockets) {
+    if (socket.rooms.has(roomName(orgId))) socket.disconnect(true);
+  }
+}
+
+export async function closeRealtime() {
+  const activeServer = io;
+  io = null;
+  if (!activeServer) return;
+  await new Promise<void>((resolve) => activeServer.close(() => resolve()));
 }

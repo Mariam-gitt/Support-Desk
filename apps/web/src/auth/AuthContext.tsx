@@ -1,16 +1,18 @@
 // React tools: createContext shares data with the whole app, the hooks keep state and react to events
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 // The API helper and the event name fired when the token stops working
-import { UNAUTHORIZED_EVENT, api } from "../lib/api.js";
+import { ACCESS_TOKEN_EVENT, UNAUTHORIZED_EVENT, api, getAccessToken, setAccessToken } from "../lib/api.js";
 // The shapes of our data
-import type { LoginData, Membership } from "../lib/types.js";
+import type { LoginData, Membership, SessionProfile } from "../lib/types.js";
 // Helpers that save and read the login in the browser tab
 import { clearSession, readOrgId, readSession, writeOrgId, writeSession } from "./session.js";
 
 // Everything other components may use from the auth system
 type AuthValue = {
   // The saved login (null = logged out)
-  session: LoginData | null;
+  session: SessionProfile | null;
+  accessToken: string | null;
+  ready: boolean;
   // The business the person is currently working in (with their role there)
   currentOrg: Membership | null;
   // Switch to another business
@@ -19,9 +21,20 @@ type AuthValue = {
   login: (email: string, password: string) => Promise<void>;
   // Create a business plus its owner account, then log in
   register: (input: { name: string; email: string; password: string; organizationName: string }) => Promise<void>;
+  acceptInvitation: (input: { token: string; name: string; password: string }) => Promise<void>;
   // Log out
   logout: () => void;
 };
+
+let restoreRequest: Promise<LoginData> | null = null;
+function restoreSession() {
+  if (!restoreRequest) {
+    restoreRequest = api<LoginData>("/auth/refresh", { method: "POST", auth: false }).finally(() => {
+      restoreRequest = null;
+    });
+  }
+  return restoreRequest;
+}
 
 // The context itself: a "shared box" any component can read
 const AuthContext = createContext<AuthValue | null>(null);
@@ -29,36 +42,71 @@ const AuthContext = createContext<AuthValue | null>(null);
 // The provider wraps the whole app (see main.tsx) and fills the shared box
 export function AuthProvider({ children }: { children: ReactNode }) {
   // The login, loaded from the tab's storage when the app starts (so a refresh keeps you logged in)
-  const [session, setSession] = useState<LoginData | null>(() => readSession());
+  const [session, setSession] = useState<SessionProfile | null>(() => readSession());
+  const [accessTokenState, setAccessTokenState] = useState<string | null>(null);
   // The chosen business id
   const [orgId, setOrgId] = useState<string | null>(() => readOrgId());
+  const [ready, setReady] = useState(false);
 
-  // When the API says our token is no longer valid, drop the login (this shows the login page)
-  useEffect(() => {
-    // The function that runs when the event fires
-    const onUnauthorized = () => setSession(null);
-    // Start listening
-    window.addEventListener(UNAUTHORIZED_EVENT, onUnauthorized);
-    // Stop listening when this component goes away (cleanup)
-    return () => window.removeEventListener(UNAUTHORIZED_EVENT, onUnauthorized);
-  }, []);
-
-  // Save a fresh login and pick a business (the remembered one if it still exists, otherwise the first)
   const startSession = useCallback((data: LoginData) => {
-    // Save it in the tab's storage
     writeSession(data);
-    // Remember it in memory (this re-renders the app)
-    setSession(data);
-    // Prefer the previously chosen business
+    const { token, ...profile } = data;
+    setSession(profile);
+    setAccessToken(token);
+    setAccessTokenState(token);
     const remembered = data.memberships.find((m) => m.organizationId === readOrgId());
-    // Otherwise the first business
     const chosen = remembered ?? data.memberships[0];
-    // Save and remember the choice
     if (chosen) {
       writeOrgId(chosen.organizationId);
       setOrgId(chosen.organizationId);
     }
   }, []);
+
+  useEffect(() => {
+    let active = true;
+    const onUnauthorized = () => {
+      clearSession();
+      setSession(null);
+      setAccessToken(null);
+      setAccessTokenState(null);
+      setOrgId(null);
+    };
+    const onAccessToken = (event: Event) => {
+      setAccessTokenState((event as CustomEvent<string | null>).detail);
+    };
+    window.addEventListener(UNAUTHORIZED_EVENT, onUnauthorized);
+    window.addEventListener(ACCESS_TOKEN_EVENT, onAccessToken);
+    if (getAccessToken()) {
+      setAccessTokenState(getAccessToken());
+      setReady(true);
+      return () => {
+        active = false;
+        window.removeEventListener(UNAUTHORIZED_EVENT, onUnauthorized);
+        window.removeEventListener(ACCESS_TOKEN_EVENT, onAccessToken);
+      };
+    }
+    void restoreSession()
+      .then((data) => {
+        if (active) startSession(data);
+      })
+      .catch((error) => {
+        if (active && !(error instanceof Error && "status" in error && error.status === 401)) {
+          console.error("Session restore failed:", error);
+        }
+        if (active) {
+          clearSession();
+          setSession(null);
+        }
+      })
+      .finally(() => {
+        if (active) setReady(true);
+      });
+    return () => {
+      active = false;
+      window.removeEventListener(UNAUTHORIZED_EVENT, onUnauthorized);
+      window.removeEventListener(ACCESS_TOKEN_EVENT, onAccessToken);
+    };
+  }, [startSession]);
 
   // Log in: ask the API, then start the session
   const login = useCallback(
@@ -82,12 +130,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     [login],
   );
 
+  const acceptInvitation = useCallback(
+    async (input: { token: string; name: string; password: string }) => {
+      const data = await api<LoginData>("/auth/invitations/accept", { method: "POST", body: input, auth: false });
+      startSession(data);
+    },
+    [startSession],
+  );
+
   // Log out: forget everything saved
   const logout = useCallback(() => {
-    // Clear the tab's storage
+    void api("/auth/logout", { method: "POST", auth: false }).catch((error) => {
+      console.error("Logout request failed:", error);
+    });
     clearSession();
-    // Clear memory
     setSession(null);
+    setAccessToken(null);
+    setAccessTokenState(null);
     setOrgId(null);
   }, []);
 
@@ -104,8 +163,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // useMemo keeps the object the same between renders unless something really changed (avoids needless re-renders)
   const value = useMemo<AuthValue>(
-    () => ({ session, currentOrg, setCurrentOrg, login, register, logout }),
-    [session, currentOrg, setCurrentOrg, login, register, logout],
+    () => ({ session, accessToken: accessTokenState, ready, currentOrg, setCurrentOrg, login, register, acceptInvitation, logout }),
+    [session, accessTokenState, ready, currentOrg, setCurrentOrg, login, register, acceptInvitation, logout],
   );
 
   // Make the value available to every component inside

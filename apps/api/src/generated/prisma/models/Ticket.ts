@@ -35,6 +35,7 @@ export type TicketMinAggregateOutputType = {
   priority: $Enums.TicketPriority | null
   createdAt: Date | null
   updatedAt: Date | null
+  publicTokenHash: string | null
 }
 
 export type TicketMaxAggregateOutputType = {
@@ -48,6 +49,7 @@ export type TicketMaxAggregateOutputType = {
   priority: $Enums.TicketPriority | null
   createdAt: Date | null
   updatedAt: Date | null
+  publicTokenHash: string | null
 }
 
 export type TicketCountAggregateOutputType = {
@@ -61,6 +63,7 @@ export type TicketCountAggregateOutputType = {
   priority: number
   createdAt: number
   updatedAt: number
+  publicTokenHash: number
   _all: number
 }
 
@@ -76,6 +79,7 @@ export type TicketMinAggregateInputType = {
   priority?: true
   createdAt?: true
   updatedAt?: true
+  publicTokenHash?: true
 }
 
 export type TicketMaxAggregateInputType = {
@@ -89,6 +93,7 @@ export type TicketMaxAggregateInputType = {
   priority?: true
   createdAt?: true
   updatedAt?: true
+  publicTokenHash?: true
 }
 
 export type TicketCountAggregateInputType = {
@@ -102,6 +107,7 @@ export type TicketCountAggregateInputType = {
   priority?: true
   createdAt?: true
   updatedAt?: true
+  publicTokenHash?: true
   _all?: true
 }
 
@@ -188,6 +194,7 @@ export type TicketGroupByOutputType = {
   priority: $Enums.TicketPriority
   createdAt: Date
   updatedAt: Date
+  publicTokenHash: string | null
   _count: TicketCountAggregateOutputType | null
   _min: TicketMinAggregateOutputType | null
   _max: TicketMaxAggregateOutputType | null
@@ -222,6 +229,7 @@ export type TicketWhereInput = {
   priority?: Prisma.EnumTicketPriorityFilter<"Ticket"> | $Enums.TicketPriority
   createdAt?: Prisma.DateTimeFilter<"Ticket"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Ticket"> | Date | string
+  publicTokenHash?: Prisma.StringNullableFilter<"Ticket"> | string | null
   organization?: Prisma.XOR<Prisma.OrganizationScalarRelationFilter, Prisma.OrganizationWhereInput>
   customer?: Prisma.XOR<Prisma.CustomerScalarRelationFilter, Prisma.CustomerWhereInput>
   assignedTo?: Prisma.XOR<Prisma.MembershipNullableScalarRelationFilter, Prisma.MembershipWhereInput> | null
@@ -239,6 +247,7 @@ export type TicketOrderByWithRelationInput = {
   priority?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  publicTokenHash?: Prisma.SortOrderInput | Prisma.SortOrder
   organization?: Prisma.OrganizationOrderByWithRelationInput
   customer?: Prisma.CustomerOrderByWithRelationInput
   assignedTo?: Prisma.MembershipOrderByWithRelationInput
@@ -247,6 +256,7 @@ export type TicketOrderByWithRelationInput = {
 
 export type TicketWhereUniqueInput = Prisma.AtLeast<{
   id?: string
+  publicTokenHash?: string
   AND?: Prisma.TicketWhereInput | Prisma.TicketWhereInput[]
   OR?: Prisma.TicketWhereInput[]
   NOT?: Prisma.TicketWhereInput | Prisma.TicketWhereInput[]
@@ -263,7 +273,7 @@ export type TicketWhereUniqueInput = Prisma.AtLeast<{
   customer?: Prisma.XOR<Prisma.CustomerScalarRelationFilter, Prisma.CustomerWhereInput>
   assignedTo?: Prisma.XOR<Prisma.MembershipNullableScalarRelationFilter, Prisma.MembershipWhereInput> | null
   messages?: Prisma.MessageListRelationFilter
-}, "id">
+}, "id" | "publicTokenHash">
 
 export type TicketOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
@@ -276,6 +286,7 @@ export type TicketOrderByWithAggregationInput = {
   priority?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  publicTokenHash?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.TicketCountOrderByAggregateInput
   _max?: Prisma.TicketMaxOrderByAggregateInput
   _min?: Prisma.TicketMinOrderByAggregateInput
@@ -295,6 +306,7 @@ export type TicketScalarWhereWithAggregatesInput = {
   priority?: Prisma.EnumTicketPriorityWithAggregatesFilter<"Ticket"> | $Enums.TicketPriority
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Ticket"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"Ticket"> | Date | string
+  publicTokenHash?: Prisma.StringNullableWithAggregatesFilter<"Ticket"> | string | null
 }
 
 export type TicketCreateInput = {
@@ -305,6 +317,7 @@ export type TicketCreateInput = {
   priority?: $Enums.TicketPriority
   createdAt?: Date | string
   updatedAt?: Date | string
+  publicTokenHash?: string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutTicketsInput
   customer: Prisma.CustomerCreateNestedOneWithoutTicketsInput
   assignedTo?: Prisma.MembershipCreateNestedOneWithoutAssignedTicketsInput
@@ -322,6 +335,7 @@ export type TicketUncheckedCreateInput = {
   priority?: $Enums.TicketPriority
   createdAt?: Date | string
   updatedAt?: Date | string
+  publicTokenHash?: string | null
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutTicketInput
 }
 
@@ -333,6 +347,7 @@ export type TicketUpdateInput = {
   priority?: Prisma.EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publicTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutTicketsNestedInput
   customer?: Prisma.CustomerUpdateOneRequiredWithoutTicketsNestedInput
   assignedTo?: Prisma.MembershipUpdateOneWithoutAssignedTicketsNestedInput
@@ -350,6 +365,7 @@ export type TicketUncheckedUpdateInput = {
   priority?: Prisma.EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publicTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   messages?: Prisma.MessageUncheckedUpdateManyWithoutTicketNestedInput
 }
 
@@ -364,6 +380,7 @@ export type TicketCreateManyInput = {
   priority?: $Enums.TicketPriority
   createdAt?: Date | string
   updatedAt?: Date | string
+  publicTokenHash?: string | null
 }
 
 export type TicketUpdateManyMutationInput = {
@@ -374,6 +391,7 @@ export type TicketUpdateManyMutationInput = {
   priority?: Prisma.EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publicTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type TicketUncheckedUpdateManyInput = {
@@ -387,6 +405,7 @@ export type TicketUncheckedUpdateManyInput = {
   priority?: Prisma.EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publicTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type TicketListRelationFilter = {
@@ -410,6 +429,7 @@ export type TicketCountOrderByAggregateInput = {
   priority?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  publicTokenHash?: Prisma.SortOrder
 }
 
 export type TicketMaxOrderByAggregateInput = {
@@ -423,6 +443,7 @@ export type TicketMaxOrderByAggregateInput = {
   priority?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  publicTokenHash?: Prisma.SortOrder
 }
 
 export type TicketMinOrderByAggregateInput = {
@@ -436,6 +457,7 @@ export type TicketMinOrderByAggregateInput = {
   priority?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  publicTokenHash?: Prisma.SortOrder
 }
 
 export type TicketScalarRelationFilter = {
@@ -603,6 +625,7 @@ export type TicketCreateWithoutOrganizationInput = {
   priority?: $Enums.TicketPriority
   createdAt?: Date | string
   updatedAt?: Date | string
+  publicTokenHash?: string | null
   customer: Prisma.CustomerCreateNestedOneWithoutTicketsInput
   assignedTo?: Prisma.MembershipCreateNestedOneWithoutAssignedTicketsInput
   messages?: Prisma.MessageCreateNestedManyWithoutTicketInput
@@ -618,6 +641,7 @@ export type TicketUncheckedCreateWithoutOrganizationInput = {
   priority?: $Enums.TicketPriority
   createdAt?: Date | string
   updatedAt?: Date | string
+  publicTokenHash?: string | null
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutTicketInput
 }
 
@@ -661,6 +685,7 @@ export type TicketScalarWhereInput = {
   priority?: Prisma.EnumTicketPriorityFilter<"Ticket"> | $Enums.TicketPriority
   createdAt?: Prisma.DateTimeFilter<"Ticket"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"Ticket"> | Date | string
+  publicTokenHash?: Prisma.StringNullableFilter<"Ticket"> | string | null
 }
 
 export type TicketCreateWithoutAssignedToInput = {
@@ -671,6 +696,7 @@ export type TicketCreateWithoutAssignedToInput = {
   priority?: $Enums.TicketPriority
   createdAt?: Date | string
   updatedAt?: Date | string
+  publicTokenHash?: string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutTicketsInput
   customer: Prisma.CustomerCreateNestedOneWithoutTicketsInput
   messages?: Prisma.MessageCreateNestedManyWithoutTicketInput
@@ -686,6 +712,7 @@ export type TicketUncheckedCreateWithoutAssignedToInput = {
   priority?: $Enums.TicketPriority
   createdAt?: Date | string
   updatedAt?: Date | string
+  publicTokenHash?: string | null
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutTicketInput
 }
 
@@ -723,6 +750,7 @@ export type TicketCreateWithoutCustomerInput = {
   priority?: $Enums.TicketPriority
   createdAt?: Date | string
   updatedAt?: Date | string
+  publicTokenHash?: string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutTicketsInput
   assignedTo?: Prisma.MembershipCreateNestedOneWithoutAssignedTicketsInput
   messages?: Prisma.MessageCreateNestedManyWithoutTicketInput
@@ -738,6 +766,7 @@ export type TicketUncheckedCreateWithoutCustomerInput = {
   priority?: $Enums.TicketPriority
   createdAt?: Date | string
   updatedAt?: Date | string
+  publicTokenHash?: string | null
   messages?: Prisma.MessageUncheckedCreateNestedManyWithoutTicketInput
 }
 
@@ -775,6 +804,7 @@ export type TicketCreateWithoutMessagesInput = {
   priority?: $Enums.TicketPriority
   createdAt?: Date | string
   updatedAt?: Date | string
+  publicTokenHash?: string | null
   organization: Prisma.OrganizationCreateNestedOneWithoutTicketsInput
   customer: Prisma.CustomerCreateNestedOneWithoutTicketsInput
   assignedTo?: Prisma.MembershipCreateNestedOneWithoutAssignedTicketsInput
@@ -791,6 +821,7 @@ export type TicketUncheckedCreateWithoutMessagesInput = {
   priority?: $Enums.TicketPriority
   createdAt?: Date | string
   updatedAt?: Date | string
+  publicTokenHash?: string | null
 }
 
 export type TicketCreateOrConnectWithoutMessagesInput = {
@@ -817,6 +848,7 @@ export type TicketUpdateWithoutMessagesInput = {
   priority?: Prisma.EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publicTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutTicketsNestedInput
   customer?: Prisma.CustomerUpdateOneRequiredWithoutTicketsNestedInput
   assignedTo?: Prisma.MembershipUpdateOneWithoutAssignedTicketsNestedInput
@@ -833,6 +865,7 @@ export type TicketUncheckedUpdateWithoutMessagesInput = {
   priority?: Prisma.EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publicTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type TicketCreateManyOrganizationInput = {
@@ -845,6 +878,7 @@ export type TicketCreateManyOrganizationInput = {
   priority?: $Enums.TicketPriority
   createdAt?: Date | string
   updatedAt?: Date | string
+  publicTokenHash?: string | null
 }
 
 export type TicketUpdateWithoutOrganizationInput = {
@@ -855,6 +889,7 @@ export type TicketUpdateWithoutOrganizationInput = {
   priority?: Prisma.EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publicTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   customer?: Prisma.CustomerUpdateOneRequiredWithoutTicketsNestedInput
   assignedTo?: Prisma.MembershipUpdateOneWithoutAssignedTicketsNestedInput
   messages?: Prisma.MessageUpdateManyWithoutTicketNestedInput
@@ -870,6 +905,7 @@ export type TicketUncheckedUpdateWithoutOrganizationInput = {
   priority?: Prisma.EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publicTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   messages?: Prisma.MessageUncheckedUpdateManyWithoutTicketNestedInput
 }
 
@@ -883,6 +919,7 @@ export type TicketUncheckedUpdateManyWithoutOrganizationInput = {
   priority?: Prisma.EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publicTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type TicketCreateManyAssignedToInput = {
@@ -895,6 +932,7 @@ export type TicketCreateManyAssignedToInput = {
   priority?: $Enums.TicketPriority
   createdAt?: Date | string
   updatedAt?: Date | string
+  publicTokenHash?: string | null
 }
 
 export type TicketUpdateWithoutAssignedToInput = {
@@ -905,6 +943,7 @@ export type TicketUpdateWithoutAssignedToInput = {
   priority?: Prisma.EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publicTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutTicketsNestedInput
   customer?: Prisma.CustomerUpdateOneRequiredWithoutTicketsNestedInput
   messages?: Prisma.MessageUpdateManyWithoutTicketNestedInput
@@ -920,6 +959,7 @@ export type TicketUncheckedUpdateWithoutAssignedToInput = {
   priority?: Prisma.EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publicTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   messages?: Prisma.MessageUncheckedUpdateManyWithoutTicketNestedInput
 }
 
@@ -933,6 +973,7 @@ export type TicketUncheckedUpdateManyWithoutAssignedToInput = {
   priority?: Prisma.EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publicTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 export type TicketCreateManyCustomerInput = {
@@ -945,6 +986,7 @@ export type TicketCreateManyCustomerInput = {
   priority?: $Enums.TicketPriority
   createdAt?: Date | string
   updatedAt?: Date | string
+  publicTokenHash?: string | null
 }
 
 export type TicketUpdateWithoutCustomerInput = {
@@ -955,6 +997,7 @@ export type TicketUpdateWithoutCustomerInput = {
   priority?: Prisma.EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publicTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   organization?: Prisma.OrganizationUpdateOneRequiredWithoutTicketsNestedInput
   assignedTo?: Prisma.MembershipUpdateOneWithoutAssignedTicketsNestedInput
   messages?: Prisma.MessageUpdateManyWithoutTicketNestedInput
@@ -970,6 +1013,7 @@ export type TicketUncheckedUpdateWithoutCustomerInput = {
   priority?: Prisma.EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publicTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   messages?: Prisma.MessageUncheckedUpdateManyWithoutTicketNestedInput
 }
 
@@ -983,6 +1027,7 @@ export type TicketUncheckedUpdateManyWithoutCustomerInput = {
   priority?: Prisma.EnumTicketPriorityFieldUpdateOperationsInput | $Enums.TicketPriority
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publicTokenHash?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
 }
 
 
@@ -1027,6 +1072,7 @@ export type TicketSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs =
   priority?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  publicTokenHash?: boolean
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   customer?: boolean | Prisma.CustomerDefaultArgs<ExtArgs>
   assignedTo?: boolean | Prisma.Ticket$assignedToArgs<ExtArgs>
@@ -1045,6 +1091,7 @@ export type TicketSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extens
   priority?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  publicTokenHash?: boolean
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   customer?: boolean | Prisma.CustomerDefaultArgs<ExtArgs>
   assignedTo?: boolean | Prisma.Ticket$assignedToArgs<ExtArgs>
@@ -1061,6 +1108,7 @@ export type TicketSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extens
   priority?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  publicTokenHash?: boolean
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   customer?: boolean | Prisma.CustomerDefaultArgs<ExtArgs>
   assignedTo?: boolean | Prisma.Ticket$assignedToArgs<ExtArgs>
@@ -1077,9 +1125,10 @@ export type TicketSelectScalar = {
   priority?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  publicTokenHash?: boolean
 }
 
-export type TicketOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "customerId" | "assignedToId" | "subject" | "description" | "status" | "priority" | "createdAt" | "updatedAt", ExtArgs["result"]["ticket"]>
+export type TicketOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "organizationId" | "customerId" | "assignedToId" | "subject" | "description" | "status" | "priority" | "createdAt" | "updatedAt" | "publicTokenHash", ExtArgs["result"]["ticket"]>
 export type TicketInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   organization?: boolean | Prisma.OrganizationDefaultArgs<ExtArgs>
   customer?: boolean | Prisma.CustomerDefaultArgs<ExtArgs>
@@ -1117,6 +1166,7 @@ export type $TicketPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs
     priority: $Enums.TicketPriority
     createdAt: Date
     updatedAt: Date
+    publicTokenHash: string | null
   }, ExtArgs["result"]["ticket"]>
   composites: {}
 }
@@ -1554,6 +1604,7 @@ export interface TicketFieldRefs {
   readonly priority: Prisma.FieldRef<"Ticket", 'TicketPriority'>
   readonly createdAt: Prisma.FieldRef<"Ticket", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"Ticket", 'DateTime'>
+  readonly publicTokenHash: Prisma.FieldRef<"Ticket", 'String'>
 }
     
 

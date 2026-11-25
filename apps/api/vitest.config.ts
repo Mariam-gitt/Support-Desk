@@ -3,6 +3,9 @@ import { defineConfig } from "vitest/config";
 
 // Settings for the test runner (Vitest = a fast test framework that understands TypeScript)
 export default defineConfig({
+  resolve: {
+    alias: [{ find: /^(\.\.?\/.*)\.js$/, replacement: "$1.ts" }],
+  },
   test: {
     // Which files are tests
     include: ["tests/**/*.test.ts"],

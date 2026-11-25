@@ -38,6 +38,33 @@ describe("auth", () => {
     expect(res.body.data.memberships).toHaveLength(1);
   });
 
+  it("rotates refresh tokens in an httpOnly cookie and revokes them on logout", async () => {
+    const owner = await createWorkspace();
+    const login = await api().post("/api/auth/login").send({ email: owner.email, password: PASSWORD });
+    expect(login.status).toBe(200);
+    expect(login.body.data).not.toHaveProperty("refreshToken");
+    const initialCookie = String(login.headers["set-cookie"]);
+    expect(initialCookie).toMatch(/HttpOnly/i);
+    expect(initialCookie).toMatch(/SameSite=Strict/i);
+    const initialPair = initialCookie.split(";")[0]!;
+
+    const unauthenticated = await api().post("/api/auth/refresh");
+    expect(unauthenticated.status).toBe(401);
+
+    const refreshed = await api().post("/api/auth/refresh").set("Cookie", initialPair);
+    expect(refreshed.status).toBe(200);
+    const rotatedCookie = String(refreshed.headers["set-cookie"]);
+    const rotatedPair = rotatedCookie.split(";")[0]!;
+    expect(rotatedPair).not.toBe(initialPair);
+    expect(refreshed.body.data.token).toEqual(expect.any(String));
+
+    const reused = await api().post("/api/auth/refresh").set("Cookie", initialPair);
+    expect(reused.status).toBe(401);
+    const logout = await api().post("/api/auth/logout").set("Cookie", rotatedPair);
+    expect(logout.status).toBe(200);
+    expect((await api().post("/api/auth/refresh").set("Cookie", rotatedPair)).status).toBe(401);
+  });
+
   // The error must not reveal whether the email exists
   it("answers a wrong password and an unknown email identically", async () => {
     // A real account

@@ -36,3 +36,11 @@ export const TicketPriority = {
 } as const
 
 export type TicketPriority = (typeof TicketPriority)[keyof typeof TicketPriority]
+
+
+export const MessageSenderType = {
+  STAFF: 'STAFF',
+  CUSTOMER: 'CUSTOMER'
+} as const
+
+export type MessageSenderType = (typeof MessageSenderType)[keyof typeof MessageSenderType]

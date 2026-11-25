@@ -53,3 +53,4 @@ When a bug or mistake teaches us something, add it to "Lessons learned" at the b
 - BullMQ 6 does not install its Redis client: add `ioredis` to dependencies yourself.
 - Our tsconfig is strict about optional properties; passing `string | undefined` to `x?: string` fails, so declare `x?: string | undefined`.
 - The API process and the worker are separate processes: the worker cannot call `emitToOrg` (Socket.IO lives in the API process). Cross-process real-time needs the Redis adapter (planned).
+- Vitest can resolve relative `.js` imports to ignored, stale build outputs in `src/`; alias those imports to TypeScript sources so tests exercise the code being edited.

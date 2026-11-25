@@ -28,6 +28,8 @@ export type MessageMinAggregateOutputType = {
   id: string | null
   ticketId: string | null
   senderId: string | null
+  customerId: string | null
+  senderType: $Enums.MessageSenderType | null
   body: string | null
   createdAt: Date | null
 }
@@ -36,6 +38,8 @@ export type MessageMaxAggregateOutputType = {
   id: string | null
   ticketId: string | null
   senderId: string | null
+  customerId: string | null
+  senderType: $Enums.MessageSenderType | null
   body: string | null
   createdAt: Date | null
 }
@@ -44,6 +48,8 @@ export type MessageCountAggregateOutputType = {
   id: number
   ticketId: number
   senderId: number
+  customerId: number
+  senderType: number
   body: number
   createdAt: number
   _all: number
@@ -54,6 +60,8 @@ export type MessageMinAggregateInputType = {
   id?: true
   ticketId?: true
   senderId?: true
+  customerId?: true
+  senderType?: true
   body?: true
   createdAt?: true
 }
@@ -62,6 +70,8 @@ export type MessageMaxAggregateInputType = {
   id?: true
   ticketId?: true
   senderId?: true
+  customerId?: true
+  senderType?: true
   body?: true
   createdAt?: true
 }
@@ -70,6 +80,8 @@ export type MessageCountAggregateInputType = {
   id?: true
   ticketId?: true
   senderId?: true
+  customerId?: true
+  senderType?: true
   body?: true
   createdAt?: true
   _all?: true
@@ -150,7 +162,9 @@ export type MessageGroupByArgs<ExtArgs extends runtime.Types.Extensions.Internal
 export type MessageGroupByOutputType = {
   id: string
   ticketId: string
-  senderId: string
+  senderId: string | null
+  customerId: string | null
+  senderType: $Enums.MessageSenderType
   body: string
   createdAt: Date
   _count: MessageCountAggregateOutputType | null
@@ -179,21 +193,27 @@ export type MessageWhereInput = {
   NOT?: Prisma.MessageWhereInput | Prisma.MessageWhereInput[]
   id?: Prisma.StringFilter<"Message"> | string
   ticketId?: Prisma.StringFilter<"Message"> | string
-  senderId?: Prisma.StringFilter<"Message"> | string
+  senderId?: Prisma.StringNullableFilter<"Message"> | string | null
+  customerId?: Prisma.StringNullableFilter<"Message"> | string | null
+  senderType?: Prisma.EnumMessageSenderTypeFilter<"Message"> | $Enums.MessageSenderType
   body?: Prisma.StringFilter<"Message"> | string
   createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string
   ticket?: Prisma.XOR<Prisma.TicketScalarRelationFilter, Prisma.TicketWhereInput>
-  sender?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  sender?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  customer?: Prisma.XOR<Prisma.CustomerNullableScalarRelationFilter, Prisma.CustomerWhereInput> | null
 }
 
 export type MessageOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   ticketId?: Prisma.SortOrder
-  senderId?: Prisma.SortOrder
+  senderId?: Prisma.SortOrderInput | Prisma.SortOrder
+  customerId?: Prisma.SortOrderInput | Prisma.SortOrder
+  senderType?: Prisma.SortOrder
   body?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   ticket?: Prisma.TicketOrderByWithRelationInput
   sender?: Prisma.UserOrderByWithRelationInput
+  customer?: Prisma.CustomerOrderByWithRelationInput
 }
 
 export type MessageWhereUniqueInput = Prisma.AtLeast<{
@@ -202,17 +222,22 @@ export type MessageWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.MessageWhereInput[]
   NOT?: Prisma.MessageWhereInput | Prisma.MessageWhereInput[]
   ticketId?: Prisma.StringFilter<"Message"> | string
-  senderId?: Prisma.StringFilter<"Message"> | string
+  senderId?: Prisma.StringNullableFilter<"Message"> | string | null
+  customerId?: Prisma.StringNullableFilter<"Message"> | string | null
+  senderType?: Prisma.EnumMessageSenderTypeFilter<"Message"> | $Enums.MessageSenderType
   body?: Prisma.StringFilter<"Message"> | string
   createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string
   ticket?: Prisma.XOR<Prisma.TicketScalarRelationFilter, Prisma.TicketWhereInput>
-  sender?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  sender?: Prisma.XOR<Prisma.UserNullableScalarRelationFilter, Prisma.UserWhereInput> | null
+  customer?: Prisma.XOR<Prisma.CustomerNullableScalarRelationFilter, Prisma.CustomerWhereInput> | null
 }, "id">
 
 export type MessageOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   ticketId?: Prisma.SortOrder
-  senderId?: Prisma.SortOrder
+  senderId?: Prisma.SortOrderInput | Prisma.SortOrder
+  customerId?: Prisma.SortOrderInput | Prisma.SortOrder
+  senderType?: Prisma.SortOrder
   body?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   _count?: Prisma.MessageCountOrderByAggregateInput
@@ -226,39 +251,49 @@ export type MessageScalarWhereWithAggregatesInput = {
   NOT?: Prisma.MessageScalarWhereWithAggregatesInput | Prisma.MessageScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"Message"> | string
   ticketId?: Prisma.StringWithAggregatesFilter<"Message"> | string
-  senderId?: Prisma.StringWithAggregatesFilter<"Message"> | string
+  senderId?: Prisma.StringNullableWithAggregatesFilter<"Message"> | string | null
+  customerId?: Prisma.StringNullableWithAggregatesFilter<"Message"> | string | null
+  senderType?: Prisma.EnumMessageSenderTypeWithAggregatesFilter<"Message"> | $Enums.MessageSenderType
   body?: Prisma.StringWithAggregatesFilter<"Message"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"Message"> | Date | string
 }
 
 export type MessageCreateInput = {
   id?: string
+  senderType?: $Enums.MessageSenderType
   body: string
   createdAt?: Date | string
   ticket: Prisma.TicketCreateNestedOneWithoutMessagesInput
-  sender: Prisma.UserCreateNestedOneWithoutMessagesInput
+  sender?: Prisma.UserCreateNestedOneWithoutMessagesInput
+  customer?: Prisma.CustomerCreateNestedOneWithoutMessagesInput
 }
 
 export type MessageUncheckedCreateInput = {
   id?: string
   ticketId: string
-  senderId: string
+  senderId?: string | null
+  customerId?: string | null
+  senderType?: $Enums.MessageSenderType
   body: string
   createdAt?: Date | string
 }
 
 export type MessageUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  senderType?: Prisma.EnumMessageSenderTypeFieldUpdateOperationsInput | $Enums.MessageSenderType
   body?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ticket?: Prisma.TicketUpdateOneRequiredWithoutMessagesNestedInput
-  sender?: Prisma.UserUpdateOneRequiredWithoutMessagesNestedInput
+  sender?: Prisma.UserUpdateOneWithoutMessagesNestedInput
+  customer?: Prisma.CustomerUpdateOneWithoutMessagesNestedInput
 }
 
 export type MessageUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   ticketId?: Prisma.StringFieldUpdateOperationsInput | string
-  senderId?: Prisma.StringFieldUpdateOperationsInput | string
+  senderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  senderType?: Prisma.EnumMessageSenderTypeFieldUpdateOperationsInput | $Enums.MessageSenderType
   body?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -266,13 +301,16 @@ export type MessageUncheckedUpdateInput = {
 export type MessageCreateManyInput = {
   id?: string
   ticketId: string
-  senderId: string
+  senderId?: string | null
+  customerId?: string | null
+  senderType?: $Enums.MessageSenderType
   body: string
   createdAt?: Date | string
 }
 
 export type MessageUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  senderType?: Prisma.EnumMessageSenderTypeFieldUpdateOperationsInput | $Enums.MessageSenderType
   body?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -280,7 +318,9 @@ export type MessageUpdateManyMutationInput = {
 export type MessageUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   ticketId?: Prisma.StringFieldUpdateOperationsInput | string
-  senderId?: Prisma.StringFieldUpdateOperationsInput | string
+  senderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  senderType?: Prisma.EnumMessageSenderTypeFieldUpdateOperationsInput | $Enums.MessageSenderType
   body?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -299,6 +339,8 @@ export type MessageCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   ticketId?: Prisma.SortOrder
   senderId?: Prisma.SortOrder
+  customerId?: Prisma.SortOrder
+  senderType?: Prisma.SortOrder
   body?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -307,6 +349,8 @@ export type MessageMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   ticketId?: Prisma.SortOrder
   senderId?: Prisma.SortOrder
+  customerId?: Prisma.SortOrder
+  senderType?: Prisma.SortOrder
   body?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -315,6 +359,8 @@ export type MessageMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   ticketId?: Prisma.SortOrder
   senderId?: Prisma.SortOrder
+  customerId?: Prisma.SortOrder
+  senderType?: Prisma.SortOrder
   body?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
 }
@@ -361,6 +407,48 @@ export type MessageUncheckedUpdateManyWithoutSenderNestedInput = {
   deleteMany?: Prisma.MessageScalarWhereInput | Prisma.MessageScalarWhereInput[]
 }
 
+export type MessageCreateNestedManyWithoutCustomerInput = {
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutCustomerInput, Prisma.MessageUncheckedCreateWithoutCustomerInput> | Prisma.MessageCreateWithoutCustomerInput[] | Prisma.MessageUncheckedCreateWithoutCustomerInput[]
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutCustomerInput | Prisma.MessageCreateOrConnectWithoutCustomerInput[]
+  createMany?: Prisma.MessageCreateManyCustomerInputEnvelope
+  connect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+}
+
+export type MessageUncheckedCreateNestedManyWithoutCustomerInput = {
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutCustomerInput, Prisma.MessageUncheckedCreateWithoutCustomerInput> | Prisma.MessageCreateWithoutCustomerInput[] | Prisma.MessageUncheckedCreateWithoutCustomerInput[]
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutCustomerInput | Prisma.MessageCreateOrConnectWithoutCustomerInput[]
+  createMany?: Prisma.MessageCreateManyCustomerInputEnvelope
+  connect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+}
+
+export type MessageUpdateManyWithoutCustomerNestedInput = {
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutCustomerInput, Prisma.MessageUncheckedCreateWithoutCustomerInput> | Prisma.MessageCreateWithoutCustomerInput[] | Prisma.MessageUncheckedCreateWithoutCustomerInput[]
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutCustomerInput | Prisma.MessageCreateOrConnectWithoutCustomerInput[]
+  upsert?: Prisma.MessageUpsertWithWhereUniqueWithoutCustomerInput | Prisma.MessageUpsertWithWhereUniqueWithoutCustomerInput[]
+  createMany?: Prisma.MessageCreateManyCustomerInputEnvelope
+  set?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+  disconnect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+  delete?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+  connect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+  update?: Prisma.MessageUpdateWithWhereUniqueWithoutCustomerInput | Prisma.MessageUpdateWithWhereUniqueWithoutCustomerInput[]
+  updateMany?: Prisma.MessageUpdateManyWithWhereWithoutCustomerInput | Prisma.MessageUpdateManyWithWhereWithoutCustomerInput[]
+  deleteMany?: Prisma.MessageScalarWhereInput | Prisma.MessageScalarWhereInput[]
+}
+
+export type MessageUncheckedUpdateManyWithoutCustomerNestedInput = {
+  create?: Prisma.XOR<Prisma.MessageCreateWithoutCustomerInput, Prisma.MessageUncheckedCreateWithoutCustomerInput> | Prisma.MessageCreateWithoutCustomerInput[] | Prisma.MessageUncheckedCreateWithoutCustomerInput[]
+  connectOrCreate?: Prisma.MessageCreateOrConnectWithoutCustomerInput | Prisma.MessageCreateOrConnectWithoutCustomerInput[]
+  upsert?: Prisma.MessageUpsertWithWhereUniqueWithoutCustomerInput | Prisma.MessageUpsertWithWhereUniqueWithoutCustomerInput[]
+  createMany?: Prisma.MessageCreateManyCustomerInputEnvelope
+  set?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+  disconnect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+  delete?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+  connect?: Prisma.MessageWhereUniqueInput | Prisma.MessageWhereUniqueInput[]
+  update?: Prisma.MessageUpdateWithWhereUniqueWithoutCustomerInput | Prisma.MessageUpdateWithWhereUniqueWithoutCustomerInput[]
+  updateMany?: Prisma.MessageUpdateManyWithWhereWithoutCustomerInput | Prisma.MessageUpdateManyWithWhereWithoutCustomerInput[]
+  deleteMany?: Prisma.MessageScalarWhereInput | Prisma.MessageScalarWhereInput[]
+}
+
 export type MessageCreateNestedManyWithoutTicketInput = {
   create?: Prisma.XOR<Prisma.MessageCreateWithoutTicketInput, Prisma.MessageUncheckedCreateWithoutTicketInput> | Prisma.MessageCreateWithoutTicketInput[] | Prisma.MessageUncheckedCreateWithoutTicketInput[]
   connectOrCreate?: Prisma.MessageCreateOrConnectWithoutTicketInput | Prisma.MessageCreateOrConnectWithoutTicketInput[]
@@ -403,16 +491,24 @@ export type MessageUncheckedUpdateManyWithoutTicketNestedInput = {
   deleteMany?: Prisma.MessageScalarWhereInput | Prisma.MessageScalarWhereInput[]
 }
 
+export type EnumMessageSenderTypeFieldUpdateOperationsInput = {
+  set?: $Enums.MessageSenderType
+}
+
 export type MessageCreateWithoutSenderInput = {
   id?: string
+  senderType?: $Enums.MessageSenderType
   body: string
   createdAt?: Date | string
   ticket: Prisma.TicketCreateNestedOneWithoutMessagesInput
+  customer?: Prisma.CustomerCreateNestedOneWithoutMessagesInput
 }
 
 export type MessageUncheckedCreateWithoutSenderInput = {
   id?: string
   ticketId: string
+  customerId?: string | null
+  senderType?: $Enums.MessageSenderType
   body: string
   createdAt?: Date | string
 }
@@ -449,21 +545,71 @@ export type MessageScalarWhereInput = {
   NOT?: Prisma.MessageScalarWhereInput | Prisma.MessageScalarWhereInput[]
   id?: Prisma.StringFilter<"Message"> | string
   ticketId?: Prisma.StringFilter<"Message"> | string
-  senderId?: Prisma.StringFilter<"Message"> | string
+  senderId?: Prisma.StringNullableFilter<"Message"> | string | null
+  customerId?: Prisma.StringNullableFilter<"Message"> | string | null
+  senderType?: Prisma.EnumMessageSenderTypeFilter<"Message"> | $Enums.MessageSenderType
   body?: Prisma.StringFilter<"Message"> | string
   createdAt?: Prisma.DateTimeFilter<"Message"> | Date | string
 }
 
-export type MessageCreateWithoutTicketInput = {
+export type MessageCreateWithoutCustomerInput = {
   id?: string
+  senderType?: $Enums.MessageSenderType
   body: string
   createdAt?: Date | string
-  sender: Prisma.UserCreateNestedOneWithoutMessagesInput
+  ticket: Prisma.TicketCreateNestedOneWithoutMessagesInput
+  sender?: Prisma.UserCreateNestedOneWithoutMessagesInput
+}
+
+export type MessageUncheckedCreateWithoutCustomerInput = {
+  id?: string
+  ticketId: string
+  senderId?: string | null
+  senderType?: $Enums.MessageSenderType
+  body: string
+  createdAt?: Date | string
+}
+
+export type MessageCreateOrConnectWithoutCustomerInput = {
+  where: Prisma.MessageWhereUniqueInput
+  create: Prisma.XOR<Prisma.MessageCreateWithoutCustomerInput, Prisma.MessageUncheckedCreateWithoutCustomerInput>
+}
+
+export type MessageCreateManyCustomerInputEnvelope = {
+  data: Prisma.MessageCreateManyCustomerInput | Prisma.MessageCreateManyCustomerInput[]
+  skipDuplicates?: boolean
+}
+
+export type MessageUpsertWithWhereUniqueWithoutCustomerInput = {
+  where: Prisma.MessageWhereUniqueInput
+  update: Prisma.XOR<Prisma.MessageUpdateWithoutCustomerInput, Prisma.MessageUncheckedUpdateWithoutCustomerInput>
+  create: Prisma.XOR<Prisma.MessageCreateWithoutCustomerInput, Prisma.MessageUncheckedCreateWithoutCustomerInput>
+}
+
+export type MessageUpdateWithWhereUniqueWithoutCustomerInput = {
+  where: Prisma.MessageWhereUniqueInput
+  data: Prisma.XOR<Prisma.MessageUpdateWithoutCustomerInput, Prisma.MessageUncheckedUpdateWithoutCustomerInput>
+}
+
+export type MessageUpdateManyWithWhereWithoutCustomerInput = {
+  where: Prisma.MessageScalarWhereInput
+  data: Prisma.XOR<Prisma.MessageUpdateManyMutationInput, Prisma.MessageUncheckedUpdateManyWithoutCustomerInput>
+}
+
+export type MessageCreateWithoutTicketInput = {
+  id?: string
+  senderType?: $Enums.MessageSenderType
+  body: string
+  createdAt?: Date | string
+  sender?: Prisma.UserCreateNestedOneWithoutMessagesInput
+  customer?: Prisma.CustomerCreateNestedOneWithoutMessagesInput
 }
 
 export type MessageUncheckedCreateWithoutTicketInput = {
   id?: string
-  senderId: string
+  senderId?: string | null
+  customerId?: string | null
+  senderType?: $Enums.MessageSenderType
   body: string
   createdAt?: Date | string
 }
@@ -497,20 +643,26 @@ export type MessageUpdateManyWithWhereWithoutTicketInput = {
 export type MessageCreateManySenderInput = {
   id?: string
   ticketId: string
+  customerId?: string | null
+  senderType?: $Enums.MessageSenderType
   body: string
   createdAt?: Date | string
 }
 
 export type MessageUpdateWithoutSenderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  senderType?: Prisma.EnumMessageSenderTypeFieldUpdateOperationsInput | $Enums.MessageSenderType
   body?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   ticket?: Prisma.TicketUpdateOneRequiredWithoutMessagesNestedInput
+  customer?: Prisma.CustomerUpdateOneWithoutMessagesNestedInput
 }
 
 export type MessageUncheckedUpdateWithoutSenderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   ticketId?: Prisma.StringFieldUpdateOperationsInput | string
+  customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  senderType?: Prisma.EnumMessageSenderTypeFieldUpdateOperationsInput | $Enums.MessageSenderType
   body?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -518,34 +670,80 @@ export type MessageUncheckedUpdateWithoutSenderInput = {
 export type MessageUncheckedUpdateManyWithoutSenderInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   ticketId?: Prisma.StringFieldUpdateOperationsInput | string
+  customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  senderType?: Prisma.EnumMessageSenderTypeFieldUpdateOperationsInput | $Enums.MessageSenderType
+  body?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type MessageCreateManyCustomerInput = {
+  id?: string
+  ticketId: string
+  senderId?: string | null
+  senderType?: $Enums.MessageSenderType
+  body: string
+  createdAt?: Date | string
+}
+
+export type MessageUpdateWithoutCustomerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  senderType?: Prisma.EnumMessageSenderTypeFieldUpdateOperationsInput | $Enums.MessageSenderType
+  body?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  ticket?: Prisma.TicketUpdateOneRequiredWithoutMessagesNestedInput
+  sender?: Prisma.UserUpdateOneWithoutMessagesNestedInput
+}
+
+export type MessageUncheckedUpdateWithoutCustomerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ticketId?: Prisma.StringFieldUpdateOperationsInput | string
+  senderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  senderType?: Prisma.EnumMessageSenderTypeFieldUpdateOperationsInput | $Enums.MessageSenderType
+  body?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type MessageUncheckedUpdateManyWithoutCustomerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  ticketId?: Prisma.StringFieldUpdateOperationsInput | string
+  senderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  senderType?: Prisma.EnumMessageSenderTypeFieldUpdateOperationsInput | $Enums.MessageSenderType
   body?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type MessageCreateManyTicketInput = {
   id?: string
-  senderId: string
+  senderId?: string | null
+  customerId?: string | null
+  senderType?: $Enums.MessageSenderType
   body: string
   createdAt?: Date | string
 }
 
 export type MessageUpdateWithoutTicketInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
+  senderType?: Prisma.EnumMessageSenderTypeFieldUpdateOperationsInput | $Enums.MessageSenderType
   body?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  sender?: Prisma.UserUpdateOneRequiredWithoutMessagesNestedInput
+  sender?: Prisma.UserUpdateOneWithoutMessagesNestedInput
+  customer?: Prisma.CustomerUpdateOneWithoutMessagesNestedInput
 }
 
 export type MessageUncheckedUpdateWithoutTicketInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  senderId?: Prisma.StringFieldUpdateOperationsInput | string
+  senderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  senderType?: Prisma.EnumMessageSenderTypeFieldUpdateOperationsInput | $Enums.MessageSenderType
   body?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 export type MessageUncheckedUpdateManyWithoutTicketInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  senderId?: Prisma.StringFieldUpdateOperationsInput | string
+  senderId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  customerId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  senderType?: Prisma.EnumMessageSenderTypeFieldUpdateOperationsInput | $Enums.MessageSenderType
   body?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -556,64 +754,81 @@ export type MessageSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   id?: boolean
   ticketId?: boolean
   senderId?: boolean
+  customerId?: boolean
+  senderType?: boolean
   body?: boolean
   createdAt?: boolean
   ticket?: boolean | Prisma.TicketDefaultArgs<ExtArgs>
-  sender?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  sender?: boolean | Prisma.Message$senderArgs<ExtArgs>
+  customer?: boolean | Prisma.Message$customerArgs<ExtArgs>
 }, ExtArgs["result"]["message"]>
 
 export type MessageSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   ticketId?: boolean
   senderId?: boolean
+  customerId?: boolean
+  senderType?: boolean
   body?: boolean
   createdAt?: boolean
   ticket?: boolean | Prisma.TicketDefaultArgs<ExtArgs>
-  sender?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  sender?: boolean | Prisma.Message$senderArgs<ExtArgs>
+  customer?: boolean | Prisma.Message$customerArgs<ExtArgs>
 }, ExtArgs["result"]["message"]>
 
 export type MessageSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   ticketId?: boolean
   senderId?: boolean
+  customerId?: boolean
+  senderType?: boolean
   body?: boolean
   createdAt?: boolean
   ticket?: boolean | Prisma.TicketDefaultArgs<ExtArgs>
-  sender?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  sender?: boolean | Prisma.Message$senderArgs<ExtArgs>
+  customer?: boolean | Prisma.Message$customerArgs<ExtArgs>
 }, ExtArgs["result"]["message"]>
 
 export type MessageSelectScalar = {
   id?: boolean
   ticketId?: boolean
   senderId?: boolean
+  customerId?: boolean
+  senderType?: boolean
   body?: boolean
   createdAt?: boolean
 }
 
-export type MessageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ticketId" | "senderId" | "body" | "createdAt", ExtArgs["result"]["message"]>
+export type MessageOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "ticketId" | "senderId" | "customerId" | "senderType" | "body" | "createdAt", ExtArgs["result"]["message"]>
 export type MessageInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   ticket?: boolean | Prisma.TicketDefaultArgs<ExtArgs>
-  sender?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  sender?: boolean | Prisma.Message$senderArgs<ExtArgs>
+  customer?: boolean | Prisma.Message$customerArgs<ExtArgs>
 }
 export type MessageIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   ticket?: boolean | Prisma.TicketDefaultArgs<ExtArgs>
-  sender?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  sender?: boolean | Prisma.Message$senderArgs<ExtArgs>
+  customer?: boolean | Prisma.Message$customerArgs<ExtArgs>
 }
 export type MessageIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   ticket?: boolean | Prisma.TicketDefaultArgs<ExtArgs>
-  sender?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  sender?: boolean | Prisma.Message$senderArgs<ExtArgs>
+  customer?: boolean | Prisma.Message$customerArgs<ExtArgs>
 }
 
 export type $MessagePayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "Message"
   objects: {
     ticket: Prisma.$TicketPayload<ExtArgs>
-    sender: Prisma.$UserPayload<ExtArgs>
+    sender: Prisma.$UserPayload<ExtArgs> | null
+    customer: Prisma.$CustomerPayload<ExtArgs> | null
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     ticketId: string
-    senderId: string
+    senderId: string | null
+    customerId: string | null
+    senderType: $Enums.MessageSenderType
     body: string
     createdAt: Date
   }, ExtArgs["result"]["message"]>
@@ -1011,7 +1226,8 @@ readonly fields: MessageFieldRefs;
 export interface Prisma__MessageClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   ticket<T extends Prisma.TicketDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.TicketDefaultArgs<ExtArgs>>): Prisma.Prisma__TicketClient<runtime.Types.Result.GetResult<Prisma.$TicketPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  sender<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  sender<T extends Prisma.Message$senderArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Message$senderArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  customer<T extends Prisma.Message$customerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Message$customerArgs<ExtArgs>>): Prisma.Prisma__CustomerClient<runtime.Types.Result.GetResult<Prisma.$CustomerPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1044,6 +1260,8 @@ export interface MessageFieldRefs {
   readonly id: Prisma.FieldRef<"Message", 'String'>
   readonly ticketId: Prisma.FieldRef<"Message", 'String'>
   readonly senderId: Prisma.FieldRef<"Message", 'String'>
+  readonly customerId: Prisma.FieldRef<"Message", 'String'>
+  readonly senderType: Prisma.FieldRef<"Message", 'MessageSenderType'>
   readonly body: Prisma.FieldRef<"Message", 'String'>
   readonly createdAt: Prisma.FieldRef<"Message", 'DateTime'>
 }
@@ -1444,6 +1662,44 @@ export type MessageDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Limit how many Messages to delete.
    */
   limit?: number
+}
+
+/**
+ * Message.sender
+ */
+export type Message$senderArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the User
+   */
+  select?: Prisma.UserSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the User
+   */
+  omit?: Prisma.UserOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.UserInclude<ExtArgs> | null
+  where?: Prisma.UserWhereInput
+}
+
+/**
+ * Message.customer
+ */
+export type Message$customerArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Customer
+   */
+  select?: Prisma.CustomerSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Customer
+   */
+  omit?: Prisma.CustomerOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CustomerInclude<ExtArgs> | null
+  where?: Prisma.CustomerWhereInput
 }
 
 /**

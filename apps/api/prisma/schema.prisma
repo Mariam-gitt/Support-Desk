@@ -30,6 +30,11 @@ enum TicketPriority {
   URGENT
 }
 
+enum MessageSenderType {
+  STAFF
+  CUSTOMER
+}
+
 // User login identity
 model User {
   id           String   @id @default(uuid())
@@ -39,8 +44,10 @@ model User {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  memberships Membership[]
-  messages    Message[]
+  memberships     Membership[]
+  messages        Message[]
+  refreshTokens   RefreshToken[]
+  sentInvitations Invitation[]   @relation("InvitationCreator")
 }
 
 // Business workspace
@@ -53,6 +60,7 @@ model Organization {
   memberships Membership[]
   customers   Customer[]
   tickets     Ticket[]
+  invitations Invitation[]
 }
 
 // User's membership in an organization
@@ -80,6 +88,7 @@ model Customer {
 
   organization Organization @relation(fields: [organizationId], references: [id])
   tickets      Ticket[]
+  messages     Message[]
 
   @@unique([organizationId, email])
   @@index([organizationId])
@@ -98,10 +107,11 @@ model Ticket {
   createdAt      DateTime       @default(now())
   updatedAt      DateTime       @updatedAt
 
-  organization Organization @relation(fields: [organizationId], references: [id])
-  customer     Customer     @relation(fields: [customerId], references: [id])
-  assignedTo   Membership?  @relation(fields: [assignedToId], references: [id])
-  messages     Message[]
+  organization    Organization @relation(fields: [organizationId], references: [id])
+  customer        Customer     @relation(fields: [customerId], references: [id])
+  assignedTo      Membership?  @relation(fields: [assignedToId], references: [id])
+  messages        Message[]
+  publicTokenHash String?      @unique
 
   @@index([organizationId, status, createdAt])
   @@index([customerId, createdAt])
@@ -109,14 +119,47 @@ model Ticket {
 
 // Messages within a ticket
 model Message {
-  id        String   @id @default(uuid())
-  ticketId  String
-  senderId  String
-  body      String
-  createdAt DateTime @default(now())
+  id         String            @id @default(uuid())
+  ticketId   String
+  senderId   String?
+  customerId String?
+  senderType MessageSenderType @default(STAFF)
+  body       String
+  createdAt  DateTime          @default(now())
 
-  ticket Ticket @relation(fields: [ticketId], references: [id])
-  sender User   @relation(fields: [senderId], references: [id])
+  ticket   Ticket    @relation(fields: [ticketId], references: [id])
+  sender   User?     @relation(fields: [senderId], references: [id], onDelete: SetNull)
+  customer Customer? @relation(fields: [customerId], references: [id], onDelete: SetNull)
 
   @@index([ticketId, createdAt])
+}
+
+model RefreshToken {
+  id        String    @id @default(uuid())
+  userId    String
+  tokenHash String    @unique
+  expiresAt DateTime
+  revokedAt DateTime?
+  createdAt DateTime  @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, expiresAt])
+}
+
+model Invitation {
+  id             String    @id @default(uuid())
+  organizationId String
+  invitedById    String
+  email          String
+  role           Role
+  tokenHash      String    @unique
+  expiresAt      DateTime
+  acceptedAt     DateTime?
+  createdAt      DateTime  @default(now())
+
+  organization Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  invitedBy    User         @relation("InvitationCreator", fields: [invitedById], references: [id], onDelete: Cascade)
+
+  @@index([organizationId, email])
 }

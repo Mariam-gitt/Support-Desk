@@ -8,9 +8,9 @@ import { useRealtime } from "../realtime/useRealtime.js";
 // The frame around every logged-in page: header, business switcher, navigation, live indicator
 export function Layout() {
   // Who is logged in and which business they are working in
-  const { session, currentOrg, setCurrentOrg, logout } = useAuth();
+  const { session, accessToken, currentOrg, setCurrentOrg, logout } = useAuth();
   // Open the live connection for the current business; "live" is true when events are flowing
-  const live = useRealtime(currentOrg?.organizationId ?? null, session?.token ?? null);
+  const live = useRealtime(currentOrg?.organizationId ?? null, accessToken);
 
   // RequireAuth guarantees a session, but TypeScript does not know that
   if (!session) return null;
@@ -43,6 +43,7 @@ export function Layout() {
         <nav className="nav">
           <NavLink to="/tickets">Tickets</NavLink>
           <NavLink to="/customers">Customers</NavLink>
+          {(currentOrg?.role === "OWNER" || currentOrg?.role === "ADMIN") && <NavLink to="/team">Team</NavLink>}
         </nav>
         {/* The live indicator: green dot when real-time events are flowing */}
         <span className={live ? "live live-on" : "live"} title="Real-time connection">

@@ -1,5 +1,5 @@
 // The type of the data we keep for a logged-in person
-import type { LoginData } from "../lib/types.js";
+import type { LoginData, SessionProfile } from "../lib/types.js";
 
 // The names under which we save things in the browser's sessionStorage
 const SESSION_KEY = "supportdesk.session";
@@ -7,12 +7,12 @@ const SESSION_KEY = "supportdesk.session";
 const ORG_KEY = "supportdesk.org";
 
 // Read the saved login (or null when nobody is logged in)
-export function readSession(): LoginData | null {
+export function readSession(): SessionProfile | null {
   try {
     // sessionStorage = small storage that lives as long as the browser TAB; it survives a page refresh but not closing the tab
     const raw = sessionStorage.getItem(SESSION_KEY);
     // Turn the saved text back into an object (JSON = text format for data)
-    return raw ? (JSON.parse(raw) as LoginData) : null;
+    return raw ? (JSON.parse(raw) as SessionProfile) : null;
   } catch {
     // Broken or blocked storage: act as if nobody is logged in
     return null;
@@ -20,9 +20,9 @@ export function readSession(): LoginData | null {
 }
 
 // Save the login so a page refresh does not log the person out
-export function writeSession(session: LoginData) {
-  // Objects must be turned into text before saving
-  sessionStorage.setItem(SESSION_KEY, JSON.stringify(session));
+export function writeSession(session: LoginData | SessionProfile) {
+  const { user, memberships } = session;
+  sessionStorage.setItem(SESSION_KEY, JSON.stringify({ user, memberships }));
 }
 
 // Forget the login and the chosen business

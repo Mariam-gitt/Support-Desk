@@ -27,6 +27,9 @@ npm run dev                 # look for: "Local: http://localhost:5173/"
 **3. Open the app:** type `http://localhost:5173` into your browser's address bar.
 Click "Create a business account", fill the form, and you are in. To watch live updates, open the app in a second tab (or a private window, logging in as the same person) and create a ticket in one of them.
 
+## Team and customer conversations
+Owners and admins can open **Team** to invite teammates with business-specific roles. Invitation links are single-use and expire; the owner can invite admins or agents, while admins can invite agents. The same page shows the standalone customer chat link (`/chat/<organization-slug>`), which can be shared with customers. Refresh tokens are held in httpOnly cookies; access tokens remain in memory.
+
 ## Background jobs (optional)
 Set `REDIS_URL` in `apps/api/.env`, then run `npm run worker` in a third terminal.
 

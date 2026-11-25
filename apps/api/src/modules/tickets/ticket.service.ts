@@ -157,14 +157,30 @@ export async function getTicket(orgId: string, ticketId: string) {
         // Order messages chronologically
         orderBy: { createdAt: "asc" },
         // Message columns plus who wrote it
-        select: { id: true, body: true, createdAt: true, sender: { select: { id: true, name: true } } },
+        select: {
+          id: true,
+          body: true,
+          createdAt: true,
+          senderType: true,
+          sender: { select: { id: true, name: true } },
+          customer: { select: { id: true, name: true } },
+        },
       },
     },
   });
   // Not found (or belongs to another business): the caller answers 404
   if (!ticket) return null;
   // Return the clean shape
-  return shapeTicket(ticket);
+  return {
+    ...shapeTicket(ticket),
+    messages: ticket.messages.map(({ senderType, sender, customer, ...message }) => ({
+      ...message,
+      sender:
+        senderType === "STAFF"
+          ? { id: sender?.id ?? null, name: sender?.name ?? "Former staff member", type: senderType }
+          : { id: customer?.id ?? null, name: customer?.name ?? "Customer", type: senderType },
+    })),
+  };
 }
 
 // Move a ticket to a new status, following the state machine and role rules
@@ -275,13 +291,25 @@ export async function addMessage(orgId: string, ticketId: string, senderId: stri
     // The new message
     prisma.message.create({
       // Link it to the ticket and to the staff member who wrote it
-      data: { ticketId, senderId, body },
+      data: { ticketId, senderId, senderType: "STAFF", body },
       // Return the message columns plus the sender's name
-      select: { id: true, body: true, createdAt: true, sender: { select: { id: true, name: true } } },
+      select: {
+        id: true,
+        body: true,
+        createdAt: true,
+        senderType: true,
+        sender: { select: { id: true, name: true } },
+      },
     }),
     // Touch the ticket so its updatedAt changes (filtered by business, as always)
     prisma.ticket.updateMany({ where: { id: ticketId, organizationId: orgId }, data: { updatedAt: new Date() } }),
   ]);
-  // Return success with the created message
-  return { ok: true, message } as const;
+  const { senderType, sender, ...messageData } = message;
+  return {
+    ok: true,
+    message: {
+      ...messageData,
+      sender: { id: sender?.id ?? null, name: sender?.name ?? "Former staff member", type: senderType },
+    },
+  } as const;
 }

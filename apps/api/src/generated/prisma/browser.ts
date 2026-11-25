@@ -44,6 +44,16 @@ export type Customer = Prisma.CustomerModel
 export type Ticket = Prisma.TicketModel
 /**
  * Model Message
- * 
+ *
  */
 export type Message = Prisma.MessageModel
+/**
+ * Model RefreshToken
+ *
+ */
+export type RefreshToken = Prisma.RefreshTokenModel
+/**
+ * Model Invitation
+ *
+ */
+export type Invitation = Prisma.InvitationModel

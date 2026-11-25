@@ -36,6 +36,14 @@ const envSchema = z.object({
   SIMULATE_NOTIFY_FAILURES: z.coerce.number().int().min(0).default(0),
   // How many failed logins (or registrations) one IP address may make per time window
   AUTH_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(10),
+  // How long an access token remains usable before the browser refreshes it
+  ACCESS_TOKEN_MINUTES: z.coerce.number().int().positive().default(15),
+  // How long a refresh token may be used before the user must sign in again
+  REFRESH_TOKEN_DAYS: z.coerce.number().int().positive().default(30),
+  // How long an invitation link remains valid
+  INVITATION_TTL_DAYS: z.coerce.number().int().positive().default(7),
+  // How many requests one IP may send to the unauthenticated customer chat in one minute
+  PUBLIC_CHAT_RATE_LIMIT_MAX: z.coerce.number().int().positive().default(30),
   // How expensive password hashing is: each +1 doubles the time (12 is a good production value; tests use 4 for speed)
   BCRYPT_ROUNDS: z.coerce.number().int().min(4).max(15).default(12),
 });

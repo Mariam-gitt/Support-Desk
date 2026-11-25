@@ -6,17 +6,14 @@ import jwt from "jsonwebtoken";
 // The secret key proves a token was really made by our server (config/env.ts already guarantees it is long enough)
 const secret = env.JWT_SECRET;
 
-// How long a token stays valid, in seconds (60 sec * 60 min * 24 hours * 7 days = 7 days)
-const TOKEN_LIFETIME_SECONDS = 60 * 60 * 24 * 7;
-
 // Create a token for a user; the token carries ONLY the user id (roles are looked up fresh from the DB)
 export function signToken(userId: string): string {
   // The payload is empty; "subject" (the standard "sub" claim) holds who the token belongs to
   return jwt.sign({}, secret, {
     // "subject" = the user this token represents
     subject: userId,
-    // "expiresIn" = after this many seconds the token stops working
-    expiresIn: TOKEN_LIFETIME_SECONDS,
+    // Access tokens are short-lived; refresh tokens are stored separately and sent only as an httpOnly cookie.
+    expiresIn: env.ACCESS_TOKEN_MINUTES * 60,
     // HS256 = HMAC-SHA256, a signing method that uses one shared secret key
     algorithm: "HS256",
   });

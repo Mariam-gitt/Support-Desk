@@ -1,6 +1,8 @@
 // React hooks, and the query client we tell "your data is outdated, reload it"
 import { useEffect, useState } from "react";
 import { useQueryClient } from "@tanstack/react-query";
+import { ApiError, UNAUTHORIZED_EVENT, api } from "../lib/api.js";
+import type { LoginData } from "../lib/types.js";
 // The Socket.IO browser library
 import { io } from "socket.io-client";
 
@@ -17,6 +19,7 @@ export function useRealtime(orgId: string | null, token: string | null): boolean
     if (!orgId || !token) return;
     // Connect to the same address as the page (Vite's proxy forwards it to the API); the token goes in the handshake
     const socket = io({ auth: { token } });
+    let refreshing = false;
 
     // Fires on the first connection AND after every automatic reconnect
     socket.on("connect", () => {
@@ -25,6 +28,21 @@ export function useRealtime(orgId: string | null, token: string | null): boolean
     });
     // The connection dropped (Socket.IO keeps trying to reconnect by itself)
     socket.on("disconnect", () => setLive(false));
+    socket.on("connect_error", (error: Error) => {
+      if (error.message !== "Unauthorized" || refreshing) return;
+      refreshing = true;
+      void api<LoginData>("/auth/refresh", { method: "POST", auth: false })
+        .catch((refreshError) => {
+          if (refreshError instanceof ApiError && refreshError.status === 401) {
+            window.dispatchEvent(new Event(UNAUTHORIZED_EVENT));
+          } else {
+            console.error("Could not refresh real-time session:", refreshError);
+          }
+        })
+        .finally(() => {
+          refreshing = false;
+        });
+    });
 
     // When anything changes on the server, mark our cached data for this business as outdated so screens reload it
     const refresh = () => {

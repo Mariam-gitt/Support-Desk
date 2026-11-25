@@ -145,7 +145,8 @@ export function TicketDetailPage() {
       {data.messages.length === 0 && <p className="muted">No replies yet.</p>}
       {data.messages.map((message) => (
         <div className="message" key={message.id}>
-          <strong>{message.sender.name}</strong> <span className="muted">{formatDate(message.createdAt)}</span>
+          <strong>{message.sender.name} ({message.sender.type === "STAFF" ? "Staff" : "Customer"})</strong>{" "}
+          <span className="muted">{formatDate(message.createdAt)}</span>
           <p>{message.body}</p>
         </div>
       ))}

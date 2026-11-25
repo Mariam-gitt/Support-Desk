@@ -13,6 +13,7 @@ export type Membership = { organizationId: string; organizationName: string; rol
 export type User = { id: string; name: string; email: string };
 // What the login endpoint returns
 export type LoginData = { token: string; user: User; memberships: Membership[] };
+export type SessionProfile = { user: User; memberships: Membership[] };
 
 // A ticket as shown in lists
 export type TicketSummary = {
@@ -30,7 +31,12 @@ export type TicketSummary = {
   allowedNext: TicketStatus[];
 };
 // One reply in a conversation
-export type Message = { id: string; body: string; createdAt: string; sender: { id: string; name: string } };
+export type Message = {
+  id: string;
+  body: string;
+  createdAt: string;
+  sender: { id: string | null; name: string; type: "STAFF" | "CUSTOMER" };
+};
 // A ticket with its full details and conversation
 export type TicketDetail = TicketSummary & { description: string; messages: Message[] };
 // A page of results with paging information

@@ -8,6 +8,7 @@ import healthRoutes from "./routes/health.routes.js";
 import authRoutes from "./modules/auth/auth.routes.js";
 // Import the routes that live under a specific business: /api/orgs/:orgId/...
 import orgRoutes from "./modules/organizations/org.routes.js";
+import publicChatRoutes from "./modules/tickets/publicChat.routes.js";
 // The "no route matched" and "something threw" handlers (JSON answers instead of HTML pages)
 import { errorHandler, notFoundHandler } from "./middleware/errorHandler.js";
 // The validated settings
@@ -33,6 +34,7 @@ app.use("/api/health", healthRoutes);
 
 // Register authentication routes
 app.use("/api/auth", authRoutes);
+app.use("/api/public", publicChatRoutes);
 
 // Register organization routes (all protected by the authenticate + requireMembership guards)
 app.use("/api/orgs", orgRoutes);

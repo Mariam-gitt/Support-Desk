@@ -1,7 +1,7 @@
 // Test tools
 import { describe, expect, it, vi } from "vitest";
 // The code under test
-import { ApiError, UNAUTHORIZED_EVENT, api } from "./api.js";
+import { ApiError, UNAUTHORIZED_EVENT, api, setAccessToken } from "./api.js";
 // Helpers to pretend someone is logged in
 import { readSession, writeSession } from "../auth/session.js";
 import { mockFetch, sessionWithRole } from "../test/utils.js";
@@ -11,7 +11,9 @@ describe("api()", () => {
   // The token must be attached and the { success, data } envelope removed
   it("sends the login token and returns only the data", async () => {
     // Pretend someone is logged in
-    writeSession(sessionWithRole("OWNER"));
+    const session = sessionWithRole("OWNER");
+    writeSession(session);
+    setAccessToken(session.token);
     // A fake server answer
     const fake = mockFetch({ "GET /api/orgs/org1/tickets": { body: { success: true, data: { items: [] } } } });
     // Call the API
@@ -36,7 +38,9 @@ describe("api()", () => {
   // An expired token must log the person out everywhere
   it("clears the session and fires the unauthorized event on 401", async () => {
     // Logged in, but the server says the token is invalid
-    writeSession(sessionWithRole("OWNER"));
+    const session = sessionWithRole("OWNER");
+    writeSession(session);
+    setAccessToken(session.token);
     mockFetch({ "GET /api/auth/me": { status: 401, body: { success: false, message: "Invalid or expired token" } } });
     // Listen for the event the AuthProvider reacts to
     const listener = vi.fn();

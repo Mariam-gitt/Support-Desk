@@ -9,6 +9,9 @@ import { RegisterPage } from "./pages/RegisterPage.js";
 import { TicketsPage } from "./pages/TicketsPage.js";
 import { TicketDetailPage } from "./pages/TicketDetailPage.js";
 import { CustomersPage } from "./pages/CustomersPage.js";
+import { TeamPage } from "./pages/TeamPage.js";
+import { PublicChatPage } from "./pages/PublicChatPage.js";
+import { AcceptInvitationPage } from "./pages/AcceptInvitationPage.js";
 
 // The whole page structure of the app
 export function App() {
@@ -17,6 +20,8 @@ export function App() {
       {/* Public pages */}
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />
+      <Route path="/invite" element={<AcceptInvitationPage />} />
+      <Route path="/chat/:slug" element={<PublicChatPage />} />
       {/* Everything inside this group needs a login, and is drawn inside the Layout frame */}
       <Route element={<RequireAuth />}>
         <Route element={<Layout />}>
@@ -25,6 +30,7 @@ export function App() {
           <Route path="/tickets" element={<TicketsPage />} />
           <Route path="/tickets/:ticketId" element={<TicketDetailPage />} />
           <Route path="/customers" element={<CustomersPage />} />
+          <Route path="/team" element={<TeamPage />} />
         </Route>
       </Route>
       {/* Any unknown address goes home */}

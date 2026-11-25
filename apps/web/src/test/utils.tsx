@@ -9,6 +9,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { App } from "../App.js";
 import { AuthProvider } from "../auth/AuthContext.js";
 import { writeOrgId, writeSession } from "../auth/session.js";
+import { setAccessToken } from "../lib/api.js";
 // Types
 import type { LoginData, Role, TicketDetail } from "../lib/types.js";
 
@@ -25,8 +26,11 @@ export function sessionWithRole(role: Role): LoginData {
 export function renderApp(route: string, session?: LoginData) {
   // Pretend the person logged in earlier (the app reads this from the tab's storage when it starts)
   if (session) {
+    setAccessToken(session.token);
     writeSession(session);
     writeOrgId(session.memberships[0]!.organizationId);
+  } else {
+    setAccessToken(null);
   }
   // A cache that never retries failed requests, so error tests are fast
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } });
@@ -52,7 +56,9 @@ export function mockFetch(routes: Record<string, Reply>) {
     // The lookup key is "METHOD /path"
     const key = `${init?.method ?? "GET"} ${url}`;
     // Find the prepared answer
-    const reply = routes[key];
+    const reply = routes[key] ?? (key === "POST /api/auth/refresh"
+      ? { status: 401, body: { success: false, message: "Session expired. Please log in again" } }
+      : undefined);
     // Unknown requests answer 404, which makes missing mocks easy to spot
     const status = reply ? (reply.status ?? 200) : 404;
     const body = reply ? reply.body : { success: false, message: `No mock for ${key}` };

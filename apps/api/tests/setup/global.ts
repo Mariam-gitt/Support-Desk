@@ -15,7 +15,7 @@ export default async function setup() {
   // Import the database client only NOW, after the environment was prepared
   const { prisma } = await import("../../src/lib/prisma.js");
   // Empty every table so each run starts clean (safe: the name check above guarantees this is a test database)
-  await prisma.$executeRawUnsafe('TRUNCATE TABLE "Message", "Ticket", "Customer", "Membership", "Organization", "User" RESTART IDENTITY CASCADE');
+  await prisma.$executeRawUnsafe('TRUNCATE TABLE "Message", "Ticket", "Customer", "Membership", "Invitation", "RefreshToken", "Organization", "User" RESTART IDENTITY CASCADE');
   // Close the connection so the process can exit
   await prisma.$disconnect();
 }

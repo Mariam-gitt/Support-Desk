@@ -1,6 +1,7 @@
 import type { Request, Response } from "express";
 import { loginSchema, registerSchema } from "./auth.schema.js";
-import { getProfile, loginUser, registerUser } from "./auth.service.js";
+import { getProfile, loginUser, refreshSession, registerUser, revokeRefreshToken } from "./auth.service.js";
+import { clearRefreshCookie, readRefreshCookie, setRefreshCookie } from "../../lib/refreshCookie.js";
 
 // Handle organization-owner registration
 export async function registerController(req: Request, res: Response) {
@@ -75,12 +76,40 @@ export async function loginController(req: Request, res: Response) {
       return res.status(401).json({ success: false, message: "Invalid email or password" });
     }
 
-    // 200 = OK; send back the token, user and memberships
-    return res.status(200).json({ success: true, message: "Logged in successfully", data: result });
+    const { refreshToken, ...session } = result;
+    setRefreshCookie(res, refreshToken);
+    return res.status(200).json({ success: true, message: "Logged in successfully", data: session });
   } catch (error) {
     // Log unexpected errors on the server only
     console.error("Login error:", error);
     // 500 = Server Error (something broke on our side)
+    return res.status(500).json({ success: false, message: "Something went wrong" });
+  }
+}
+
+export async function refreshController(req: Request, res: Response) {
+  try {
+    const result = await refreshSession(readRefreshCookie(req.headers.cookie) ?? "");
+    if (!result) {
+      clearRefreshCookie(res);
+      return res.status(401).json({ success: false, message: "Session expired. Please log in again" });
+    }
+    const { refreshToken, ...session } = result;
+    setRefreshCookie(res, refreshToken);
+    return res.status(200).json({ success: true, data: session });
+  } catch (error) {
+    console.error("Refresh session error:", error);
+    return res.status(500).json({ success: false, message: "Something went wrong" });
+  }
+}
+
+export async function logoutController(req: Request, res: Response) {
+  try {
+    await revokeRefreshToken(readRefreshCookie(req.headers.cookie));
+    clearRefreshCookie(res);
+    return res.status(200).json({ success: true, message: "Logged out successfully" });
+  } catch (error) {
+    console.error("Logout error:", error);
     return res.status(500).json({ success: false, message: "Something went wrong" });
   }
 }
