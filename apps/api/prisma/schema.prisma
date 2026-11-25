@@ -40,7 +40,6 @@ model User {
   updatedAt    DateTime @updatedAt
 
   memberships Membership[]
-  customers   Customer[]
   messages    Message[]
 }
 
@@ -63,25 +62,26 @@ model Membership {
   organizationId String
   role           Role
 
-  user         User         @relation(fields: [userId], references: [id])
-  organization Organization @relation(fields: [organizationId], references: [id])
+  user            User         @relation(fields: [userId], references: [id])
+  organization    Organization @relation(fields: [organizationId], references: [id])
   assignedTickets Ticket[]
 
   @@unique([userId, organizationId])
   @@index([organizationId])
 }
 
-// Customer profile within an organization
+// Customer contact within an organization
 model Customer {
-  id             String @id @default(uuid())
-  userId         String
+  id             String   @id @default(uuid())
   organizationId String
+  name           String
+  email          String
+  createdAt      DateTime @default(now())
 
-  user         User         @relation(fields: [userId], references: [id])
   organization Organization @relation(fields: [organizationId], references: [id])
   tickets      Ticket[]
 
-  @@unique([userId, organizationId])
+  @@unique([organizationId, email])
   @@index([organizationId])
 }
 

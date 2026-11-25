@@ -109,8 +109,10 @@ export type MembershipScalarFieldEnum = (typeof MembershipScalarFieldEnum)[keyof
 
 export const CustomerScalarFieldEnum = {
   id: 'id',
-  userId: 'userId',
-  organizationId: 'organizationId'
+  organizationId: 'organizationId',
+  name: 'name',
+  email: 'email',
+  createdAt: 'createdAt'
 } as const
 
 export type CustomerScalarFieldEnum = (typeof CustomerScalarFieldEnum)[keyof typeof CustomerScalarFieldEnum]
